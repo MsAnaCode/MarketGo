@@ -13,7 +13,7 @@ import { colors, spacing } from '@/theme';
 import { friendlyError } from '@/utils/errors';
 
 export default function RegisterScreen() {
-  const { signUp } = useAuth();
+  const { signUp, signIn } = useAuth();
   const router = useRouter();
   const [formError, setFormError] = useState<string | null>(null);
   const {
@@ -28,15 +28,14 @@ export default function RegisterScreen() {
   const onSubmit = handleSubmit(async ({ name, email, password }) => {
     setFormError(null);
     try {
-      const { needsConfirmation } = await signUp(name.trim(), email.trim(), password);
-      if (needsConfirmation) {
-        Alert.alert(
-          'Confirme seu e-mail',
-          'Enviamos um link de confirmação. Depois de confirmar, faça login.',
-        );
+      await signUp(name.trim(), email.trim(), password);
+      // Tenta logar diretamente caso a sessão não tenha vindo automática
+      try {
+        await signIn(email.trim(), password);
+      } catch {
+        // Se ainda assim precisar logar, redireciona para tela de login silenciosamente
         router.replace('/login');
       }
-      // Sem confirmação: a sessão já existe e o app redireciona sozinho.
     } catch (error) {
       setFormError(friendlyError(error));
     }

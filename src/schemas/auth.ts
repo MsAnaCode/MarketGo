@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const email = z.string().trim().min(1, 'Informe o e-mail').email('E-mail inválido');
+const email = z.string().trim().min(1, 'Informe o e-mail');
 
 export const loginSchema = z.object({
   email,
